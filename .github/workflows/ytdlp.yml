@@ -16,7 +16,13 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Run yt-dlp with cookies
+    - name: Download video using yt-dlp
       run: |
         echo "Downloading video: ${{ inputs.video_url }}"
-        .\ytdlp.exe --cookies cookies.txt --no-playlist --output "%(title)s.%(ext)s" "${{ inputs.video_url }}"
+        .\ytdlp.exe --cookies cookies.txt --no-playlist --output "download.%(ext)s" "${{ inputs.video_url }}"
+
+    - name: Upload video as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: downloaded-video
+        path: download.*

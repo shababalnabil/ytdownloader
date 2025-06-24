@@ -1,0 +1,29 @@
+name: Download Video with yt-dlp
+
+on:
+  workflow_dispatch:
+    inputs:
+      video_url:
+        description: 'YouTube video URL'
+        required: true
+
+jobs:
+  download-video:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Make yt-dlp executable
+        run: chmod +x ./yt-dlp
+
+      - name: Download video with yt-dlp
+        run: |
+          ./yt-dlp "${{ github.event.inputs.video_url }}" -o "video.%(ext)s"
+
+      - name: Upload downloaded video as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: downloaded-video
+          path: video.*

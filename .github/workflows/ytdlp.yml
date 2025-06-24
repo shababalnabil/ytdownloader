@@ -1,4 +1,4 @@
-name: Run yt-dlp on Windows
+name: YouTube Downloader
 
 on:
   workflow_dispatch:
@@ -6,15 +6,17 @@ on:
       video_url:
         description: 'YouTube video URL'
         required: true
-        default: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+        type: string
 
 jobs:
   download-video:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Run yt-dlp.exe to download video
-        run: .\ytdlp.exe "${{ github.event.inputs.video_url }}" -o "downloaded_video.%(ext)s"
+    - name: Run yt-dlp with cookies
+      run: |
+        echo "Downloading video: ${{ inputs.video_url }}"
+        .\ytdlp.exe --cookies cookies.txt --no-playlist --output "%(title)s.%(ext)s" "${{ inputs.video_url }}"

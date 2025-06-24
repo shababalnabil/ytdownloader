@@ -25,7 +25,7 @@ jobs:
       run: |
         ./7zz x ffmpeg.7z -o./ffmpeg
         chmod +x ./ffmpeg/ffmpeg
-        chmod +x ./ffmpeg/ffprobe
+        #chmod +x ./ffmpeg/ffprobe
         ls -l ./ffmpeg
         echo "Searching for ffprobe:"
         find ./ffmpeg -iname "ffprobe*"

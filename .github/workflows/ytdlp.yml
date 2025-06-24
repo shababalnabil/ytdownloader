@@ -24,7 +24,6 @@ jobs:
     - name: Use 7zz to extract ffmpeg.7z
       run: |
         ./7zz x ffmpeg.7z -o./ffmpeg
-        ./7zz x aria2c.zip -o./aria2
         chmod +x ./ffmpeg/ffmpeg/ffmpeg
         chmod +x ./ffmpeg/ffmpeg/ffprobe
         sudo apt install snapd
@@ -36,7 +35,7 @@ jobs:
     - name: Download video using yt-dlp
       run: |
         echo "Downloading: ${{ inputs.video_url }}"
-        ./yt-dlp --cookies cookies.txt --ffmpeg-location ./ffmpeg/ffmpeg --no-playlist -f "bv*+ba/b" --merge-output-format mp4 --output "download.%(ext)s" "${{ inputs.video_url }}"
+        ./yt-dlp--downloader aria2c --downloader-args aria2c:"-x 16 -k 1M" --cookies cookies.txt --ffmpeg-location ./ffmpeg/ffmpeg --no-playlist -f "bv*+ba/b" --merge-output-format mp4 --output "download.%(ext)s" "${{ inputs.video_url }}"
 
     - name: Upload downloaded video
       uses: actions/upload-artifact@v4

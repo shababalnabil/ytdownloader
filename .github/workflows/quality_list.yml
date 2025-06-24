@@ -1,0 +1,31 @@
+name: List YouTube Formats
+
+on:
+  workflow_dispatch:
+    inputs:
+      video_url:
+        description: 'YouTube video URL'
+        required: true
+        type: string
+
+jobs:
+  list-formats:
+    runs-on: ubuntu-latest
+    outputs:
+      formats: ${{ steps.get-formats.outputs.formats }}
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Make yt-dlp executable
+      run: chmod +x ./yt-dlp
+
+    - name: Get formats list
+      id: get-formats
+      run: |
+        ./yt-dlp --list-formats "${{ inputs.video_url }}" > formats.txt
+        # Read and escape newlines for output
+        FORMATS=$(cat formats.txt | jq -Rs .)
+        echo "::set-output name=formats::$FORMATS"
+

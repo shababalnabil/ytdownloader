@@ -24,8 +24,8 @@ jobs:
     - name: Use 7zz to extract ffmpeg.7z
       run: |
         ./7zz x ffmpeg.7z -o./ffmpeg
-        chmod +x ./ffmpeg/ffmpeg
-        #chmod +x ./ffmpeg/ffprobe
+        chmod +x ./ffmpeg/ffmpeg/ffmpeg
+        chmod +x ./ffmpeg/ffmpeg/ffprobe
         ls -l ./ffmpeg
         echo "Searching for ffprobe:"
         find ./ffmpeg -iname "ffprobe*"

@@ -1,0 +1,58 @@
+name: YouTube Video Download with Format Info
+
+on:
+  workflow_dispatch:
+    inputs:
+      video_url:
+        description: 'YouTube video URL'
+        required: true
+        type: string
+      itag:
+        description: 'Format itag to download (optional)'
+        required: false
+        type: string
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Extract 7-Zip (7z.tar.xz) and setup
+      run: |
+        tar -xf 7z.tar.xz
+        chmod +x ./7zz
+        ./7zz x ffmpeg.7z -o./ffmpeg
+        chmod +x ./ffmpeg/ffmpeg/ffmpeg
+        chmod +x ./ffmpeg/ffmpeg/ffprobe
+        chmod +x ./yt-dlp
+
+    - name: Get formats JSON
+      id: get_formats
+      run: |
+        ./yt-dlp --dump-json --no-playlist "${{ github.event.inputs.video_url }}" > info.json
+        cat info.json
+      # save the JSON as an output (limited by size, so be careful)
+      # or upload as artifact later
+
+    - name: Parse available formats (example just to show)
+      run: |
+        jq '.formats[] | {itag: .format_id, format: .format, ext: .ext, filesize: .filesize}' info.json
+
+    - name: Download selected format
+      run: |
+        if [ -z "${{ github.event.inputs.itag }}" ]; then
+          echo "No itag provided, downloading best video+audio"
+          ./yt-dlp --ffmpeg-location ./ffmpeg/ffmpeg --no-playlist -f "bv*+ba/b" --merge-output-format mp4 --output "download.%(ext)s" "${{ github.event.inputs.video_url }}"
+        else
+          echo "Downloading itag ${{ github.event.inputs.itag }}"
+          ./yt-dlp --ffmpeg-location ./ffmpeg/ffmpeg --no-playlist -f "${{ github.event.inputs.itag }}" --output "download.%(ext)s" "${{ github.event.inputs.video_url }}"
+        fi
+
+    - name: Upload downloaded video
+      uses: actions/upload-artifact@v4
+      with:
+        name: downloaded-video
+        path: download.*

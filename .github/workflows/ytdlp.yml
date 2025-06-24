@@ -10,16 +10,22 @@ on:
 
 jobs:
   download-video:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Install ffmpeg
+      run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+    - name: Make yt-dlp executable
+      run: chmod +x ./yt-dlp
+
     - name: Download video using yt-dlp
       run: |
         echo "Downloading video: ${{ inputs.video_url }}"
-        .\ytdlp.exe --cookies cookies.txt --no-playlist --output "download.%(ext)s" "${{ inputs.video_url }}"
+        ./yt-dlp --cookies cookies.txt --no-playlist -f "bestvideo+bestaudio" --merge-output-format mp4 --output "download.%(ext)s" "${{ inputs.video_url }}"
 
     - name: Upload video as artifact
       uses: actions/upload-artifact@v4

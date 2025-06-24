@@ -32,17 +32,24 @@ jobs:
     - name: Make yt-dlp executable
       run: chmod +x ./yt-dlp
 
-    - name: Download video using yt-dlp
+    - name: Get video file size in bytes
+      id: get_size
       run: |
-        echo "Downloading: ${{ inputs.video_url }}"
-        ./yt-dlp --cookies cookies.txt --ffmpeg-location ./ffmpeg/ffmpeg --no-playlist -f "bv*+ba/b" --merge-output-format mp4 --output "download.%(ext)s" "${{ inputs.video_url }}"
+        size=$("./yt-dlp" --cookies cookies.txt --no-playlist --print filesize "${{ inputs.video_url }}" || echo 0)
+        echo "filesize=$size" >> $GITHUB_OUTPUT
 
-    - name: Compress downloaded video with 7zip
+    - name: Download video using yt-dlp with conditional downloader
       run: |
-        ./7zz a -mx=9 download.7z download.*
+        if [ "${{ steps.get_size.outputs.filesize }}" -gt 300000000 ]; then
+          echo "Big file detected (>300MB), using aria2c downloader"
+          ./yt-dlp --downloader ./ariac/aria2/aria2c --downloader-args aria2c:"-x 16 -k 1M" --cookies cookies.txt --ffmpeg-location ./ffmpeg/ffmpeg --no-playlist -f "bv*+ba/b" --merge-output-format mp4 --output "download.%(ext)s" "${{ inputs.video_url }}"
+        else
+          echo "Small file detected (<=300MB), using default downloader"
+          ./yt-dlp --cookies cookies.txt --ffmpeg-location ./ffmpeg/ffmpeg --no-playlist -f "bv*+ba/b" --merge-output-format mp4 --output "download.%(ext)s" "${{ inputs.video_url }}"
+        fi
 
-    - name: Upload compressed video archive
+    - name: Upload downloaded video
       uses: actions/upload-artifact@v4
       with:
-        name: downloaded-video-7z
-        path: download.7z
+        name: downloaded-video
+        path: download.*

@@ -25,7 +25,7 @@ jobs:
       run: |
         ./7zz x ffmpeg.7z -o./ffmpeg
         chmod +x ./ffmpeg/ffmpeg
-        chmod +x ./ffmpeg/ffprobe || true
+        chmod +x ./ffmpeg/ffprobe
 
     - name: Make yt-dlp executable
       run: chmod +x ./yt-dlp

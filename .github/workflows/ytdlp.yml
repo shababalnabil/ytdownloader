@@ -36,7 +36,7 @@ jobs:
     - name: Download video using yt-dlp
       run: |
         echo "Downloading: ${{ inputs.video_url }}"
-        ./yt-dlp --cookies cookies.txt --ffmpeg-location ./ffmpeg --no-playlist -f "bv*+ba/b" --merge-output-format mp4 --output "download.%(ext)s" "${{ inputs.video_url }}"
+        ./yt-dlp --cookies cookies.txt --ffmpeg-location ./ffmpeg/ffmpeg --no-playlist -f "bv*+ba/b" --merge-output-format mp4 --output "download.%(ext)s" "${{ inputs.video_url }}"
 
     - name: Upload downloaded video
       uses: actions/upload-artifact@v4

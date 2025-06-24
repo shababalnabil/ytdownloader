@@ -21,10 +21,5 @@ jobs:
 
     - name: List available formats with cookies
       run: |
-        ./yt-dlp --cookies cookies.txt --no-playlist -F "${{ inputs.video_url }}" > formats.txt
-
-    - name: Upload format list artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: format-list
-        path: formats.txt
+        echo "Available formats for ${{ inputs.video_url }}:"
+        ./yt-dlp --cookies cookies.txt --no-playlist -F "${{ inputs.video_url }}"

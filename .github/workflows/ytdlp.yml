@@ -13,21 +13,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Install ffmpeg
-      run: sudo apt-get update && sudo apt-get install -y ffmpeg
+    - name: Extract 7-Zip (7z.tar.xz)
+      run: |
+        tar -xf 7z.tar.xz
+        chmod +x ./7zz
+
+    - name: Use 7zz to extract ffmpeg.7z
+      run: |
+        ./7zz x ffmpeg.7z -o./ffmpeg
+        chmod +x ./ffmpeg/ffmpeg
+        chmod +x ./ffmpeg/ffprobe || true
 
     - name: Make yt-dlp executable
       run: chmod +x ./yt-dlp
 
     - name: Download video using yt-dlp
       run: |
-        echo "Downloading video: ${{ inputs.video_url }}"
-        ./yt-dlp --cookies cookies.txt --no-playlist -f "bestvideo+bestaudio" --merge-output-format mp4 --output "download.%(ext)s" "${{ inputs.video_url }}"
+        echo "Downloading: ${{ inputs.video_url }}"
+        ./yt-dlp --cookies cookies.txt --ffmpeg-location ./ffmpeg --no-playlist -f "bv*+ba/b" --merge-output-format mp4 --output "download.%(ext)s" "${{ inputs.video_url }}"
 
-    - name: Upload video as artifact
+    - name: Upload downloaded video
       uses: actions/upload-artifact@v4
       with:
         name: downloaded-video

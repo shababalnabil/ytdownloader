@@ -1,4 +1,4 @@
-name: Download Video with yt-dlp
+name: Run yt-dlp on Windows
 
 on:
   workflow_dispatch:
@@ -6,24 +6,15 @@ on:
       video_url:
         description: 'YouTube video URL'
         required: true
+        default: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
 
 jobs:
   download-video:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Make yt-dlp executable
-        run: chmod +x ./yt-dlp
-
-      - name: Download video with yt-dlp
-        run: |
-          ./yt-dlp "${{ github.event.inputs.video_url }}" -o "video.%(ext)s"
-
-      - name: Upload downloaded video as artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: downloaded-video
-          path: video.*
+      - name: Run yt-dlp.exe to download video
+        run: .\ytdlp.exe "${{ github.event.inputs.video_url }}" -o "downloaded_video.%(ext)s"

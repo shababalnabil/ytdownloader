@@ -27,8 +27,8 @@ jobs:
         ./7zz x aria2c.zip -o./aria2
         chmod +x ./ffmpeg/ffmpeg/ffmpeg
         chmod +x ./ffmpeg/ffmpeg/ffprobe
-        chmod +x ./aria2/aria2c/INSTALL
-        ./aria2/aria2c/INSTALL
+        sudo apt install snapd
+        sudo snap install aria2c
 
     - name: Make yt-dlp executable
       run: chmod +x ./yt-dlp
